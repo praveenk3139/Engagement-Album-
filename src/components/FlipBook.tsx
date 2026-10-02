@@ -35,13 +35,34 @@ const FlipBookComponent = forwardRef<FlipBookRef, FlipBookProps>(({
   useEffect(() => {
     if (!bookRef.current) return;
 
-    // Responsive width / height calculations per single page (3:2 ratio = 1.5:1, Open Spread = 3:1 = 10800x3600)
-    const isMobile = window.innerWidth < 768;
-    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1180;
-    const isLarge = window.innerWidth >= 1600;
+    // Calculate responsive dimensions per single page (3:2 ratio = 1.5:1, Open Spread = 3:1 = 10800x3600)
+    const getResponsiveDimensions = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const isLandscape = w > h;
 
-    const baseWidth = isMobile ? 360 : isTablet ? 450 : isLarge ? 660 : 570;
-    const baseHeight = isMobile ? 240 : isTablet ? 300 : isLarge ? 440 : 380;
+      if (w < 768) {
+        if (isLandscape) {
+          // Mobile Landscape: Maximize height without overflowing header & controls (~120px)
+          const availableHeight = Math.max(180, Math.min(h - 110, 360));
+          const singleWidth = Math.round(availableHeight * 1.5);
+          return { width: singleWidth, height: availableHeight };
+        } else {
+          // Mobile Portrait: Fit single page inside screen width
+          const singleWidth = Math.min(w - 20, 380);
+          const singleHeight = Math.round(singleWidth / 1.5);
+          return { width: singleWidth, height: singleHeight };
+        }
+      } else if (w < 1180) {
+        return { width: 460, height: 306 };
+      } else if (w >= 1600) {
+        return { width: 660, height: 440 };
+      } else {
+        return { width: 570, height: 380 };
+      }
+    };
+
+    const { width: baseWidth, height: baseHeight } = getResponsiveDimensions();
 
     let pf: PageFlip | null = null;
 
@@ -50,21 +71,21 @@ const FlipBookComponent = forwardRef<FlipBookRef, FlipBookProps>(({
         width: baseWidth,
         height: baseHeight,
         size: 'fixed',
-        minWidth: 300,
+        minWidth: 220,
         maxWidth: 750,
-        minHeight: 200,
+        minHeight: 150,
         maxHeight: 500,
         maxShadowOpacity: 0.6,
         showCover: true,
         mobileScrollSupport: false,
-        flippingTime: 800,
+        flippingTime: 650,
         useMouseEvents: true,
         clickEventForward: true,
         usePortrait: true,
-        startPage: 0,
+        startPage: currentPageRef.current || 0,
         drawShadow: true,
         showPageCorners: true,
-        swipeDistance: 30
+        swipeDistance: 20
       });
 
       const pageElements = bookRef.current.querySelectorAll('.page-item');
@@ -78,6 +99,9 @@ const FlipBookComponent = forwardRef<FlipBookRef, FlipBookProps>(({
         const page = e.data;
         currentPageRef.current = page;
         audioEngine.playPageTurn();
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          navigator.vibrate(10);
+        }
         if (onPageChange) {
           onPageChange(page, totalPages);
         }
@@ -91,10 +115,81 @@ const FlipBookComponent = forwardRef<FlipBookRef, FlipBookProps>(({
       console.error('Error initializing PageFlip', err);
     }
 
+    // Handle Window Resize and Orientation Change dynamically
+    let resizeTimer: any = null;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (pageFlipInstance.current && bookRef.current) {
+          const { width, height } = getResponsiveDimensions();
+          try {
+            // Update PageFlip configuration if dimensions shift
+            (pageFlipInstance.current as any).update({
+              width,
+              height,
+            });
+          } catch (e) {
+            // Ignore if update method signature differs
+          }
+        }
+      }, 150);
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    // Touch Swipe Gesture Support for Mobile Devices
+    let startX = 0;
+    let startY = 0;
+    let startTime = 0;
+    const container = containerRef.current;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startTime = Date.now();
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.changedTouches.length === 1) {
+        const deltaX = e.changedTouches[0].clientX - startX;
+        const deltaY = Math.abs(e.changedTouches[0].clientY - startY);
+        const elapsed = Date.now() - startTime;
+
+        // Detect horizontal swipe gesture (<500ms, >30px horizontal, <90px vertical)
+        if (elapsed < 500 && Math.abs(deltaX) > 30 && deltaY < 90) {
+          if (deltaX < 0) {
+            // Swipe left -> flip to next page
+            if (pageFlipInstance.current && !isFlippingRef.current) {
+              pageFlipInstance.current.flipNext();
+            }
+          } else {
+            // Swipe right -> flip to previous page
+            if (pageFlipInstance.current && !isFlippingRef.current) {
+              pageFlipInstance.current.flipPrev();
+            }
+          }
+        }
+      }
+    };
+
+    if (container) {
+      container.addEventListener('touchstart', handleTouchStart, { passive: true });
+      container.addEventListener('touchend', handleTouchEnd, { passive: true });
+    }
+
     return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      clearTimeout(resizeTimer);
+      if (container) {
+        container.removeEventListener('touchstart', handleTouchStart);
+        container.removeEventListener('touchend', handleTouchEnd);
+      }
       try {
         if (pf) {
-          // Prevent page-flip from removing the host element from DOM during React lifecycle
           if ((pf as any).block) {
             (pf as any).block.remove = () => {};
           }

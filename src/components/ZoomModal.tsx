@@ -71,46 +71,49 @@ export const ZoomModal: React.FC<ZoomModalProps> = ({
     setPosition({ x: 0, y: 0 });
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (zoomLevel > 1) {
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
       setIsDragging(true);
-      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+      setDragStart({ x: e.touches[0].clientX - position.x, y: e.touches[0].clientY - position.y });
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && zoomLevel > 1) {
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && zoomLevel > 1 && e.touches.length === 1) {
       setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y,
       });
     }
   };
 
-  const handleMouseUp = () => {
+  const handleTouchEnd = () => {
     setIsDragging(false);
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md select-none"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md select-none touch-none"
       onClick={onClose}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Top Floating Controls */}
       <div 
-        className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-[#181211]/90 border border-[#dfc296]/30 text-[#dfc296] z-50"
+        className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#181211]/95 border border-[#dfc296]/30 text-[#dfc296] z-50 max-w-[95vw]"
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="font-serif text-xs text-[#f7f1e5] pr-2 border-r border-[#dfc296]/20">
-          Photo {currentIndex + 1} of {images.length}
+        <span className="font-serif text-[11px] sm:text-xs text-[#f7f1e5] pr-2 border-r border-[#dfc296]/20 whitespace-nowrap">
+          {currentIndex + 1} / {images.length}
         </span>
 
         <button
           onClick={handleZoomIn}
           title="Zoom In (+)"
-          className="p-1.5 rounded-full hover:bg-[#cea267]/20 text-[#f7f1e5] cursor-pointer"
+          className="p-1.5 rounded-full hover:bg-[#cea267]/20 text-[#f7f1e5] cursor-pointer active:scale-90"
         >
           <ZoomIn className="w-4 h-4" />
         </button>
@@ -118,7 +121,7 @@ export const ZoomModal: React.FC<ZoomModalProps> = ({
         <button
           onClick={handleZoomOut}
           title="Zoom Out (-)"
-          className="p-1.5 rounded-full hover:bg-[#cea267]/20 text-[#f7f1e5] cursor-pointer"
+          className="p-1.5 rounded-full hover:bg-[#cea267]/20 text-[#f7f1e5] cursor-pointer active:scale-90"
         >
           <ZoomOut className="w-4 h-4" />
         </button>
@@ -126,7 +129,7 @@ export const ZoomModal: React.FC<ZoomModalProps> = ({
         <button
           onClick={handleResetZoom}
           title="Reset Zoom (100%)"
-          className="p-1.5 rounded-full hover:bg-[#cea267]/20 text-[#f7f1e5] cursor-pointer"
+          className="p-1.5 rounded-full hover:bg-[#cea267]/20 text-[#f7f1e5] cursor-pointer active:scale-90 hidden xs:inline-flex"
         >
           <RotateCcw className="w-4 h-4" />
         </button>
@@ -135,7 +138,7 @@ export const ZoomModal: React.FC<ZoomModalProps> = ({
           href={image.src}
           download={image.filename}
           title="Download Photograph"
-          className="p-1.5 rounded-full hover:bg-[#cea267]/20 text-[#f7f1e5] cursor-pointer"
+          className="p-1.5 rounded-full hover:bg-[#cea267]/20 text-[#f7f1e5] cursor-pointer active:scale-90"
         >
           <Download className="w-4 h-4" />
         </a>
@@ -143,7 +146,7 @@ export const ZoomModal: React.FC<ZoomModalProps> = ({
         <button
           onClick={onClose}
           title="Close Inspector (ESC)"
-          className="p-1.5 rounded-full hover:bg-[#cea267]/40 text-[#dfc296] ml-2 cursor-pointer"
+          className="p-1.5 rounded-full hover:bg-[#cea267]/40 text-[#dfc296] ml-1 cursor-pointer active:scale-90"
         >
           <X className="w-4 h-4" />
         </button>
