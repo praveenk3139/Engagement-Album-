@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+@theme {
+  --color-violet-50: #fbf7ff;
+  --color-violet-100: #f4ebfe;
+  --color-violet-200: #ebd8fc;
+  --color-violet-300: #dab9fa;
+  --color-violet-400: #c28df5;
+  --color-violet-500: #a85fee;
+  --color-violet-600: #8d38df;
+  --color-violet-700: #7425c2;
+  --color-violet-800: #5f219d;
+  --color-violet-900: #421470;
+  --color-violet-950: #230640;
+
+  --color-gold-50: #fdfbf7;
+  --color-gold-100: #f7f1e5;
+  --color-gold-200: #eddcc1;
+  --color-gold-300: #dfc296;
+  --color-gold-400: #cea267;
+  --color-gold-500: #bc8644;
+  --color-gold-600: #a36c36;
+  --color-gold-700: #82512c;
+  --color-gold-800: #6b4129;
+  --color-gold-900: #583624;
+
+  --font-serif: "Playfair Display", Cinzel, Georgia, serif;
+  --font-script: "Great Vibes", "Alex Brush", cursive;
+  --font-sans: "Montserrat", sans-serif;
+
+  --shadow-book-deep: 0 30px 90px rgba(10, 3, 18, 0.85), 0 0 50px rgba(116, 37, 194, 0.25);
+  --shadow-gold-glow: 0 0 25px rgba(255, 220, 120, 0.5), 0 0 50px rgba(206, 162, 103, 0.3);
+  --shadow-neon-wing: 0 0 20px rgba(255, 240, 190, 0.8), 0 0 45px rgba(218, 165, 32, 0.4), 0 0 80px rgba(142, 68, 173, 0.4);
+}
+
+:root {
+  --gold-primary: #ffd782;
+  --gold-light: #fff3d1;
+  --stage-purple: #4a1c7c;
+  --stage-deep: #19052b;
+}
+
+/* Global Reset */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background-color: #160626;
+}
+
+/* FlipBook Container */
+.flipbook-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.page-item {
+  width: 100%;
+  height: 100%;
+  background-color: #faf8f5;
+  overflow: hidden;
+}
+
+/* Realistic Spine Crease Shadow */
+.page-left {
+  box-shadow: inset -15px 0 25px -10px rgba(0, 0, 0, 0.3), inset 3px 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.page-right {
+  box-shadow: inset 15px 0 25px -10px rgba(0, 0, 0, 0.3), inset -3px 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Gold Foil Gradient & Shimmer */
+.gold-foil-text {
+  background: linear-gradient(135deg, #fff3d1 0%, #ffffff 30%, #dfc296 60%, #bc8644 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-shimmer-btn {
+  background: linear-gradient(135deg, #ffd782 0%, #fcedc5 40%, #c99244 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.gold-shimmer-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 80%
+  );
+  transform: rotate(30deg);
+  animation: shimmer 2.5s infinite;
+}
+
+/* Luxury Royal Purple Leather/Velvet Hardcover */
+.hardcover-texture {
+  background: radial-gradient(circle at 50% 30%, #3d145c 0%, #200735 65%, #0f021c 100%);
+  box-shadow: 
+    inset 0 0 100px rgba(0, 0, 0, 0.85),
+    inset 0 0 25px rgba(255, 215, 130, 0.25),
+    0 25px 75px rgba(0, 0, 0, 0.9);
+}
+
+/* Paper Texture */
+.paper-texture {
+  background-color: #faf7f2;
+  background-image: radial-gradient(#d8ccb9 0.5px, transparent 0.5px), radial-gradient(#d8ccb9 0.5px, #faf7f2 0.5px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+/* Stage Pleated Curtain Texture */
+.stage-curtains {
+  background: repeating-linear-gradient(
+    90deg,
+    #2a0845 0px,
+    #4a1c7c 18px,
+    #6b2d9e 36px,
+    #4a1c7c 54px,
+    #1d0533 72px
+  );
+}
+
+/* Neon Glow Outline */
+.neon-glow {
+  filter: drop-shadow(0 0 8px rgba(255, 235, 160, 0.9))
+          drop-shadow(0 0 25px rgba(255, 215, 100, 0.6))
+          drop-shadow(0 0 50px rgba(155, 89, 182, 0.5));
+}
+
+/* Stage Light Orbs */
+.stage-orb {
+  background: radial-gradient(circle, #ffffff 10%, #fff2b8 45%, #ffd766 70%, transparent 100%);
+  filter: drop-shadow(0 0 10px #ffffff) drop-shadow(0 0 20px #ffd766);
+}
+
+/* Keyframes */
+@keyframes shimmer {
+  0% { transform: translateX(-100%) rotate(30deg); }
+  100% { transform: translateX(100%) rotate(30deg); }
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+  50% { transform: translateY(-20px) scale(1.15); opacity: 0.9; }
+}
+
+@keyframes petalDrift {
+  0% {
+    transform: translateY(-8%) rotate(0deg) translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(106vh) rotate(420deg) translateX(60px);
+    opacity: 0;
+  }
+}
+
+.drifting-petal {
+  position: absolute;
+  pointer-events: none;
+  animation: petalDrift linear infinite;
+}
+
+.floating-sparkle {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  animation: floatOrb ease-in-out infinite alternate;
+}
