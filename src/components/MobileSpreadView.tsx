@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ZoomIn, Heart, Sparkles, BookOpen } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 import { albumData, AlbumImage } from '../albumData';
 import { audioEngine } from '../utils/audioEngine';
 
@@ -99,31 +99,6 @@ export const MobileSpreadView: React.FC<MobileSpreadViewProps> = ({
 
         {/* Subtle center spine fold line to preserve photobook feeling */}
         <div className="absolute inset-y-0 left-1/2 w-[1px] bg-gradient-to-b from-black/50 via-white/10 to-black/50 pointer-events-none shadow-[0_0_10px_rgba(0,0,0,0.8)]" />
-
-        {/* Top Info Badges */}
-        <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white/90 text-[10px] font-sans">
-          <Heart className="w-3 h-3 text-[#ffd782] fill-[#ffd782]" />
-          <span className="font-serif">Ramya & Saravanan</span>
-        </div>
-
-        <div className="absolute top-2 right-2 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[#ffd782] text-[10px] font-serif">
-          <Sparkles className="w-3 h-3 text-[#ffd782]" />
-          <span>Spread {currentSpreadIndex + 1} / {totalSpreads}</span>
-        </div>
-
-        {/* Center Double-Tap to Zoom Overlay Hint (Fades out) */}
-        <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1.5">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onZoomImage(currentSheet);
-            }}
-            className="px-2.5 py-1 rounded-full bg-[#1c1328]/90 text-[#ffd782] border border-[#dfc296]/40 text-[10px] font-sans font-semibold flex items-center gap-1 shadow-lg active:scale-95"
-          >
-            <ZoomIn className="w-3 h-3" />
-            <span>HD 10800×3600</span>
-          </button>
-        </div>
 
         {/* Left Arrow Button for Easy Touch */}
         {currentSpreadIndex > 0 && (
